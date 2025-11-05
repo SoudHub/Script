@@ -14,7 +14,7 @@ if success then
 else
     return
 end
-_G.firsttimeinjection = false
+_G.firsttimeinjection = true
 local player = game.Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
@@ -88,7 +88,7 @@ local Success, Response = pcall(function()
 end)
 
 if not Success then
-	warn("\nOrion Library - Executede! : " .. Response .. "\n")
+	warn("\nOrion Library - Executed! : " .. Response .. "\n")
 end	
 
 local function GetIcon(IconName)
@@ -111,11 +111,13 @@ end
 if gethui then
 	for _, Interface in ipairs(gethui():GetChildren()) do
 		if Interface.Name == Orion.Name and Interface ~= Orion then
+			Interface:Destroy()
 		end
 	end
 else
 	for _, Interface in ipairs(game.CoreGui:GetChildren()) do
 		if Interface.Name == Orion.Name and Interface ~= Orion then
+			Interface:Destroy()
 		end
 	end
 end
@@ -379,7 +381,7 @@ CreateElement("ScrollFrame", function(Color, Width)
 	local ScrollFrame = Create("ScrollingFrame", {
 		BackgroundTransparency = 1,
 		MidImage = "rbxassetid://7445543667",
-		BottomImage = "rbxassetid://12099513379",
+		BottomImage = "rbxassetid://7445543667",
 		TopImage = "rbxassetid://7445543667",
 		ScrollBarImageColor3 = Color,
 		BorderSizePixel = 0,
@@ -559,8 +561,8 @@ function OrionLib:MakeWindow(WindowConfig)
 		BackgroundTransparency = 1
 	}), {
 		AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://7072725342"), {
-			Position = UDim2.new(0, 9, 0, 6),
-			Size = UDim2.new(0, 18, 0, 18)
+			Position = UDim2.new(0, 11, 0, 8),
+			Size = UDim2.new(0, 20, 0, 20)
 		}), "Text")
 	})
 
@@ -569,8 +571,8 @@ function OrionLib:MakeWindow(WindowConfig)
 		BackgroundTransparency = 1
 	}), {
 		AddThemeObject(SetProps(MakeElement("Image", "rbxassetid://7072719338"), {
-			Position = UDim2.new(0, 9, 0, 6),
-			Size = UDim2.new(0, 18, 0, 18),
+			Position = UDim2.new(0, 11, 0, 8),
+			Size = UDim2.new(0, 20, 0, 20),
 			Name = "Ico"
 		}), "Text")
 	})
@@ -579,8 +581,8 @@ function OrionLib:MakeWindow(WindowConfig)
 		Size = UDim2.new(1, 0, 0, 50)
 	})
 
-	local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {
-		Size = UDim2.new(0, 150, 1, -50),
+	local WindowStuff = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 12), {
+		Size = UDim2.new(0, 180, 1, -50),
 		Position = UDim2.new(0, 0, 0, 50)
 	}), {
 		AddThemeObject(SetProps(MakeElement("Frame"), {
@@ -650,10 +652,10 @@ function OrionLib:MakeWindow(WindowConfig)
 		Position = UDim2.new(0, 0, 1, -1)
 	}), "Stroke")
 
-	local MainWindow = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 10), {
+	local MainWindow = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 12), {
 		Parent = Orion,
-		Position = UDim2.new(0.5, -307, 0.5, -172),
-		Size = UDim2.new(0, 615, 0, 344),
+		Position = UDim2.new(0.5, -375, 0.5, -225),
+		Size = UDim2.new(0, 750, 0, 450),
 		ClipsDescendants = true
 	}), {
 		--SetProps(MakeElement("Image", "rbxassetid://3523728077"), {
@@ -669,9 +671,9 @@ function OrionLib:MakeWindow(WindowConfig)
 		}), {
 			WindowName,
 			WindowTopBarLine,
-			AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 7), {
-				Size = UDim2.new(0, 70, 0, 30),
-				Position = UDim2.new(1, -90, 0, 10)
+			AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+				Size = UDim2.new(0, 80, 0, 35),
+				Position = UDim2.new(1, -95, 0, 8)
 			}), {
 				AddThemeObject(MakeElement("Stroke"), "Stroke"),
 				AddThemeObject(SetProps(MakeElement("Frame"), {
@@ -698,10 +700,9 @@ function OrionLib:MakeWindow(WindowConfig)
 	AddDraggingFunctionality(DragPoint, MainWindow)
 
 AddConnection(CloseBtn.MouseButton1Up, function()
-userInputService.MouseIconEnabled = false
+		userInputService.MouseIconEnabled = false
 		MainWindow.Visible = false
 		UIHidden = true
-		userInputService.MouseIconEnabled = false
 		buttonmodal.Modal = false
 		OrionLib:MakeNotification({
 			Name = "Interface Hidden",
@@ -709,39 +710,26 @@ userInputService.MouseIconEnabled = false
 			Time = 5
 		})
 		WindowConfig.CloseCallback()
-		
 	end)
 
-	AddConnection(UserInputService.InputBegan, function(Input)
+	AddConnection(UserInputService.InputBegan, function(Input, gameProcessed)
+		if gameProcessed then return end
 		if Input.KeyCode == Enum.KeyCode.M then
-						if UIHidden then
-									MainWindow.Visible = true
-							buttonmodal.Modal = true
-				userInputService.MouseIconEnabled = true
-						elseif UIHidden == false then
-										MainWindow.Visible = false
-				userInputService.MouseIconEnabled = false
-							buttonmodal.Modal = false
-										WindowConfig.CloseCallback()
-						end
+			UIHidden = not UIHidden
+			MainWindow.Visible = not UIHidden
+			buttonmodal.Modal = not UIHidden
+			userInputService.MouseIconEnabled = not UIHidden
+			if UIHidden then
+				WindowConfig.CloseCallback()
+			end
 		end
 	end)
-
-AddConnection(UserInputService.InputBegan, function(Input, gameProcessed)
-	if gameProcessed then return end
-	if Input.KeyCode == Enum.KeyCode.M then
-		UIVisible = not UIVisible
-		MainWindow.Visible = UIVisible
-		buttonmodal.Modal = UIVisible
-		UIHidden = not UIVisible
-	end
-end)
 
 
 
 	AddConnection(MinimizeBtn.MouseButton1Up, function()
 		if Minimized then
-			TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 615, 0, 344)}):Play()
+			TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 750, 0, 450)}):Play()
 			MinimizeBtn.Ico.Image = "rbxassetid://7072719338"
 			wait(.02)
 			MainWindow.ClipsDescendants = false
@@ -752,7 +740,7 @@ end)
 			WindowTopBarLine.Visible = false
 			MinimizeBtn.Ico.Image = "rbxassetid://7072720870"
 
-			TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, WindowName.TextBounds.X + 140, 0, 50)}):Play()
+			TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, WindowName.TextBounds.X + 160, 0, 50)}):Play()
 			wait(0.1)
 			WindowStuff.Visible = false	
 		end
@@ -807,19 +795,19 @@ end)
 		TabConfig.PremiumOnly = TabConfig.PremiumOnly or false
 
 		local TabFrame = SetChildren(SetProps(MakeElement("Button"), {
-			Size = UDim2.new(1, 0, 0, 30),
+			Size = UDim2.new(1, 0, 0, 36),
 			Parent = TabHolder
 		}), {
 			AddThemeObject(SetProps(MakeElement("Image", TabConfig.Icon), {
 				AnchorPoint = Vector2.new(0, 0.5),
-				Size = UDim2.new(0, 18, 0, 18),
-				Position = UDim2.new(0, 10, 0.5, 0),
+				Size = UDim2.new(0, 22, 0, 22),
+				Position = UDim2.new(0, 12, 0.5, 0),
 				ImageTransparency = 0.4,
 				Name = "Ico"
 			}), "Text"),
-			AddThemeObject(SetProps(MakeElement("Label", TabConfig.Name, 14), {
-				Size = UDim2.new(1, -35, 1, 0),
-				Position = UDim2.new(0, 35, 0, 0),
+			AddThemeObject(SetProps(MakeElement("Label", TabConfig.Name, 15), {
+				Size = UDim2.new(1, -42, 1, 0),
+				Position = UDim2.new(0, 42, 0, 0),
 				Font = Enum.Font.GothamSemibold,
 				TextTransparency = 0.4,
 				Name = "Title"
@@ -830,15 +818,15 @@ end)
 			TabFrame.Ico.Image = GetIcon(TabConfig.Icon)
 		end	
 
-		local Container = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 5), {
-			Size = UDim2.new(1, -150, 1, -50),
-			Position = UDim2.new(0, 150, 0, 50),
+		local Container = AddThemeObject(SetChildren(SetProps(MakeElement("ScrollFrame", Color3.fromRGB(255, 255, 255), 6), {
+			Size = UDim2.new(1, -180, 1, -50),
+			Position = UDim2.new(0, 180, 0, 50),
 			Parent = MainWindow,
 			Visible = false,
 			Name = "ItemContainer"
 		}), {
-			MakeElement("List", 0, 6),
-			MakeElement("Padding", 15, 10, 10, 15)
+			MakeElement("List", 0, 8),
+			MakeElement("Padding", 18, 12, 12, 18)
 		}), "Divider")
 
 		AddConnection(Container.UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"), function()
@@ -875,8 +863,8 @@ end)
 		local function GetElements(ItemParent)
 			local ElementFunction = {}
 			function ElementFunction:AddLabel(Text)
-				local LabelFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-					Size = UDim2.new(1, 0, 0, 30),
+				local LabelFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+					Size = UDim2.new(1, 0, 0, 36),
 					BackgroundTransparency = 0.7,
 					Parent = ItemParent
 				}), {
@@ -899,8 +887,8 @@ end)
     Text = Text or "Text"
     Content = Content or "Content"
 
-    local ParagraphFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-        Size = UDim2.new(1, 0, 0, 30),
+    local ParagraphFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+        Size = UDim2.new(1, 0, 0, 36),
         BackgroundTransparency = 0.7,
         Parent = ItemParent
     }), {
@@ -956,8 +944,8 @@ function ElementFunction:AddPlayerParagraph(userId)
 		username = result[1].Username or "Unknown"
 	end
 
-	local ParagraphFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-		Size = UDim2.new(1, 0, 0, 70),
+	local ParagraphFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+		Size = UDim2.new(1, 0, 0, 80),
 		BackgroundTransparency = 0.7,
 		Parent = ItemParent
 	}), {
@@ -1036,8 +1024,8 @@ end
 					Size = UDim2.new(1, 0, 1, 0)
 				})
 
-				local ButtonFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-					Size = UDim2.new(1, 0, 0, 33),
+				local ButtonFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+					Size = UDim2.new(1, 0, 0, 40),
 					Parent = ItemParent
 				}), {
 					AddThemeObject(SetProps(MakeElement("Label", ButtonConfig.Name, 15), {
@@ -1113,8 +1101,8 @@ end
 					}),
 				})
 
-				local ToggleFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-					Size = UDim2.new(1, 0, 0, 38),
+				local ToggleFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+					Size = UDim2.new(1, 0, 0, 44),
 					Parent = ItemParent
 				}), {
 					AddThemeObject(SetProps(MakeElement("Label", ToggleConfig.Name, 15), {
@@ -1209,8 +1197,8 @@ end
 					SliderDrag
 				})
 
-				local SliderFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 4), {
-					Size = UDim2.new(1, 0, 0, 65),
+				local SliderFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+					Size = UDim2.new(1, 0, 0, 75),
 					Parent = ItemParent
 				}), {
 					AddThemeObject(SetProps(MakeElement("Label", SliderConfig.Name, 15), {
@@ -1287,8 +1275,8 @@ end
 					Size = UDim2.new(1, 0, 1, 0)
 				})
 
-				local DropdownFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-					Size = UDim2.new(1, 0, 0, 38),
+				local DropdownFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+					Size = UDim2.new(1, 0, 0, 44),
 					Parent = ItemParent,
 					ClipsDescendants = true
 				}), {
@@ -1461,7 +1449,7 @@ function ElementFunction:AddPlayerDropdown(Config)
     local DropdownFrame = AddThemeObject(
         SetChildren(
             SetProps(
-                MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5),
+                MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8),
                 { Size = UDim2.new(1, 0, 0, 38), Parent = ItemParent, ClipsDescendants = true }
             ),
             {
@@ -1676,14 +1664,14 @@ end
 				BindConfig.Flag = BindConfig.Flag or nil
 				BindConfig.Save = BindConfig.Save or false
 
-				local Bind = {Value, Binding = false, Type = "Bind", Save = BindConfig.Save}
+				local Bind = {Value = BindConfig.Default, Binding = false, Type = "Bind", Save = BindConfig.Save}
 				local Holding = false
 
 				local Click = SetProps(MakeElement("Button"), {
 					Size = UDim2.new(1, 0, 1, 0)
 				})
 
-				local BindBox = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 4), {
+				local BindBox = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
 					Size = UDim2.new(0, 24, 0, 24),
 					Position = UDim2.new(1, -12, 0.5, 0),
 					AnchorPoint = Vector2.new(1, 0.5)
@@ -1697,8 +1685,8 @@ end
 					}), "Text")
 				}), "Main")
 
-				local BindFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-					Size = UDim2.new(1, 0, 0, 38),
+				local BindFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+					Size = UDim2.new(1, 0, 0, 44),
 					Parent = ItemParent
 				}), {
 					AddThemeObject(SetProps(MakeElement("Label", BindConfig.Name, 15), {
@@ -1813,7 +1801,7 @@ end
 					ClearTextOnFocus = false
 				}), "Text")
 
-				local TextContainer = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 4), {
+				local TextContainer = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
 					Size = UDim2.new(0, 24, 0, 24),
 					Position = UDim2.new(1, -12, 0.5, 0),
 					AnchorPoint = Vector2.new(1, 0.5)
@@ -1823,8 +1811,8 @@ end
 				}), "Main")
 
 
-				local TextboxFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-					Size = UDim2.new(1, 0, 0, 38),
+				local TextboxFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+					Size = UDim2.new(1, 0, 0, 44),
 					Parent = ItemParent
 				}), {
 					AddThemeObject(SetProps(MakeElement("Label", TextboxConfig.Name, 15), {
@@ -1937,7 +1925,7 @@ end
 					Size = UDim2.new(1, 0, 1, 0)
 				})
 
-				local ColorpickerBox = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 4), {
+				local ColorpickerBox = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
 					Size = UDim2.new(0, 24, 0, 24),
 					Position = UDim2.new(1, -12, 0.5, 0),
 					AnchorPoint = Vector2.new(1, 0.5)
@@ -1945,8 +1933,8 @@ end
 					AddThemeObject(MakeElement("Stroke"), "Stroke")
 				}), "Main")
 
-				local ColorpickerFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 5), {
-					Size = UDim2.new(1, 0, 0, 38),
+				local ColorpickerFrame = AddThemeObject(SetChildren(SetProps(MakeElement("RoundFrame", Color3.fromRGB(255, 255, 255), 0, 8), {
+					Size = UDim2.new(1, 0, 0, 44),
 					Parent = ItemParent
 				}), {
 					SetProps(SetChildren(MakeElement("TFrame"), {
