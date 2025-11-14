@@ -43,6 +43,13 @@ local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
 
+-- Configurações para mobile
+local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
+if isMobile then
+	-- Configurações específicas para mobile
+	UserInputService.ModalEnabled = true
+end
+
 local OrionLib = {
 	Elements = {},
 	ThemeObjects = {},
@@ -139,6 +146,29 @@ local function AddConnection(Signal, Function)
 	return SignalConnect
 end
 
+-- Função para adicionar suporte a touch em botões (melhorada)
+local function AddTouchSupport(Button, Callback)
+	-- Mouse click (desktop)
+	AddConnection(Button.MouseButton1Click, Callback)
+	
+	-- Touch support (mobile) - método 1
+	AddConnection(Button.InputEnded, function(Input)
+		if Input.UserInputType == Enum.UserInputType.Touch then
+			Callback()
+		end
+	end)
+	
+	-- Touch support (mobile) - método 2 (mais responsivo)
+	AddConnection(Button.TouchTap, function()
+		Callback()
+	end)
+	
+	-- Activated event (funciona tanto para mouse quanto touch)
+	AddConnection(Button.Activated, function()
+		Callback()
+	end)
+end
+
 task.spawn(function()
 	while (OrionLib:IsRunning()) do
 		wait()
@@ -152,8 +182,10 @@ end)
 local function AddDraggingFunctionality(DragPoint, Main)
 	pcall(function()
 		local Dragging, DragInput, MousePos, FramePos = false
+		
+		-- Suporte para mouse e touch
 		DragPoint.InputBegan:Connect(function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+			if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
 				Dragging = true
 				MousePos = Input.Position
 				FramePos = Main.Position
@@ -165,15 +197,30 @@ local function AddDraggingFunctionality(DragPoint, Main)
 				end)
 			end
 		end)
+		
+		-- Detectar movimento do mouse e touch
 		DragPoint.InputChanged:Connect(function(Input)
-			if Input.UserInputType == Enum.UserInputType.MouseMovement then
+			if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
 				DragInput = Input
 			end
 		end)
+		
+		-- Sistema de drag melhorado para mobile
 		UserInputService.InputChanged:Connect(function(Input)
 			if Input == DragInput and Dragging then
 				local Delta = Input.Position - MousePos
-				TweenService:Create(Main, TweenInfo.new(0.45, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)}):Play()
+				local tweenTime = isMobile and 0.1 or 0.45
+				local easingStyle = isMobile and Enum.EasingStyle.Linear or Enum.EasingStyle.Quint
+				TweenService:Create(Main, TweenInfo.new(tweenTime, easingStyle, Enum.EasingDirection.Out), {Position  = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)}):Play()
+			end
+		end)
+		
+		-- Sistema alternativo para touch (mais responsivo)
+		UserInputService.TouchMoved:Connect(function(touch, gameProcessed)
+			if not gameProcessed and Dragging then
+				local Delta = touch.Position - MousePos
+				-- Movimento instantâneo para melhor responsividade em mobile
+				Main.Position = UDim2.new(FramePos.X.Scale,FramePos.X.Offset + Delta.X, FramePos.Y.Scale, FramePos.Y.Offset + Delta.Y)
 			end
 		end)
 	end)
@@ -698,7 +745,7 @@ function OrionLib:MakeWindow(WindowConfig)
 
 	AddDraggingFunctionality(DragPoint, MainWindow)
 
-AddConnection(CloseBtn.MouseButton1Up, function()
+AddTouchSupport(CloseBtn, function()
 userInputService.MouseIconEnabled = false
 		MainWindow.Visible = false
 		UIHidden = true
@@ -740,7 +787,7 @@ end)
 
 
 
-	AddConnection(MinimizeBtn.MouseButton1Up, function()
+	AddTouchSupport(MinimizeBtn, function()
 		if Minimized then
 			TweenService:Create(MainWindow, TweenInfo.new(0.5, Enum.EasingStyle.Quint, Enum.EasingDirection.Out), {Size = UDim2.new(0, 615, 0, 344)}):Play()
 			MinimizeBtn.Ico.Image = "rbxassetid://7072719338"
@@ -854,7 +901,7 @@ end)
 			Container.Visible = true
 		end    
 
-		AddConnection(TabFrame.MouseButton1Click, function()
+		AddTouchSupport(TabFrame, function()
 			for _, Tab in next, TabHolder:GetChildren() do
 				if Tab:IsA("TextButton") then
 					Tab.Title.Font = Enum.Font.GothamSemibold
@@ -1719,7 +1766,7 @@ end
 				end)
 
 				AddConnection(Click.InputEnded, function(Input)
-					if Input.UserInputType == Enum.UserInputType.MouseButton1 then
+					if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
 						if Bind.Binding then return end
 						Bind.Binding = true
 						BindBox.Value.Text = ""
