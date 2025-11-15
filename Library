@@ -1468,14 +1468,14 @@ function ElementFunction:AddPlayerDropdown(Config)
     Config.Callback      = Config.Callback or function() end
     Config.Flag          = Config.Flag     or nil
     Config.Save          = Config.Save     or false
+    -- Definindo cores padrão
     Config.Color = Config.Color or Color3.fromRGB(35, 0, 60)
-    -- Corrigindo a multiplicação de cores para evitar erro de aritmética com Color3
-    if Config.Color and not Config.SelectedColor then
-        local r, g, b = math.min(Config.Color.R * 1.2, 1), 
-                        math.min(Config.Color.G * 1.2, 1), 
-                        math.min(Config.Color.B * 1.2, 1)
-        Config.SelectedColor = Color3.new(r, g, b)
+    
+    -- Se a cor for preta, definimos um cinza escuro como cor selecionada
+    if Config.Color == Color3.fromRGB(0, 0, 0) then
+        Config.SelectedColor = Color3.fromRGB(50, 50, 50)  -- Cinza escuro para seleção
     else
+        -- Para outras cores, usamos um valor fixo para SelectedColor
         Config.SelectedColor = Config.SelectedColor or Color3.fromRGB(55, 0, 95)
     end
 
