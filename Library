@@ -1468,8 +1468,16 @@ function ElementFunction:AddPlayerDropdown(Config)
     Config.Callback      = Config.Callback or function() end
     Config.Flag          = Config.Flag     or nil
     Config.Save          = Config.Save     or false
-    Config.Color         = Config.Color    or Color3.fromRGB(35, 0, 60)
-    Config.SelectedColor = Config.SelectedColor or (Config.Color and (Config.Color * 1.2) or Color3.fromRGB(55, 0, 95))
+    Config.Color = Config.Color or Color3.fromRGB(35, 0, 60)
+    -- Corrigindo a multiplicação de cores para evitar erro de aritmética com Color3
+    if Config.Color and not Config.SelectedColor then
+        local r, g, b = math.min(Config.Color.R * 1.2, 1), 
+                        math.min(Config.Color.G * 1.2, 1), 
+                        math.min(Config.Color.B * 1.2, 1)
+        Config.SelectedColor = Color3.new(r, g, b)
+    else
+        Config.SelectedColor = Config.SelectedColor or Color3.fromRGB(55, 0, 95)
+    end
 
     local Dropdown = {
         Value           = Config.Default,
