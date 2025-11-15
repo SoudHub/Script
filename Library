@@ -1463,11 +1463,13 @@ end
 
 function ElementFunction:AddPlayerDropdown(Config)
     Config = Config or {}
-    Config.Name     = Config.Name     or "PlayerDropdown"
-    Config.Default  = Config.Default  or nil
-    Config.Callback = Config.Callback or function() end
-    Config.Flag     = Config.Flag     or nil
-    Config.Save     = Config.Save     or false
+    Config.Name          = Config.Name     or "PlayerDropdown"
+    Config.Default       = Config.Default  or nil
+    Config.Callback      = Config.Callback or function() end
+    Config.Flag          = Config.Flag     or nil
+    Config.Save          = Config.Save     or false
+    Config.Color         = Config.Color    or Color3.fromRGB(35, 0, 60)
+    Config.SelectedColor = Config.SelectedColor or (Config.Color and (Config.Color * 1.2) or Color3.fromRGB(55, 0, 95))
 
     local Dropdown = {
         Value           = Config.Default,
@@ -1479,8 +1481,8 @@ function ElementFunction:AddPlayerDropdown(Config)
     }
     local MaxElements = 5
 
-    local ButtonColor   = Color3.fromRGB(35, 0, 60)
-    local SelectedColor = Color3.fromRGB(55, 0, 95)
+    local ButtonColor   = Config.Color
+    local SelectedColor = Config.SelectedColor
 
     local DropdownList = MakeElement("List")
     local DropdownContainer = AddThemeObject(
